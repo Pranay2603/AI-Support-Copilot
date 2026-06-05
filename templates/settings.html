@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Settings</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+
+        <h2>AI Copilot</h2>
+
+        <a href="/new-chat" class="sidebar-link new-chat-btn">
+            + New Chat
+        </a>
+
+        <a href="/dashboard" class="sidebar-link">
+            Dashboard
+        </a>
+
+        <a href="/chat" class="sidebar-link">
+            AI Chat
+        </a>
+
+        <a href="/analytics" class="sidebar-link">
+            Analytics
+        </a>
+
+        <a href="/settings" class="sidebar-link active-page">
+            Settings
+        </a>
+
+        <h3 class="recent-heading">
+            Recents
+        </h3>
+
+        <div class="conversation-list">
+
+            {% for convo in conversations %}
+
+                <div class="conversation-item">
+
+                    <a
+                        href="/conversation/{{ convo[0] }}"
+                        class="sidebar-link {% if convo[0] == active_conversation %}active-chat{% endif %}"
+                    >
+                        {{ convo[1][:30] if convo[1] else "New Chat" }}
+                    </a>
+
+                    <a
+                        href="/delete-conversation/{{ convo[0] }}"
+                        class="delete-btn delete-conversation-link"
+                    >
+                        🗑
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <div class="main">
+
+        <div class="settings-page">
+
+            <div class="settings-header">
+
+                <h1>Settings</h1>
+
+                <p>
+                    Manage your profile, AI preferences, and account settings
+                </p>
+
+            </div>
+
+            <div class="settings-grid">
+
+                <div class="settings-card">
+
+                    <form action="/update-profile" method="POST">
+
+                        <h2>Profile Settings</h2>
+
+                        <div class="settings-group">
+
+                            <label>Username</label>
+
+                            <input
+                                type="text"
+                                name="username"
+                                value="{{ username }}"
+                            >
+
+                        </div>
+
+                        <div class="settings-group">
+
+                            <label>Email</label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                value="{{ email }}"
+                            >
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="save-btn"
+                        >
+                            Save Changes
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <div class="settings-card">
+
+                    <h2>AI Preferences</h2>
+
+                    <div class="settings-group">
+
+                        <label>AI Model</label>
+
+                        <select>
+
+                            <option>Groq Llama 3.3</option>
+
+                            <option>GPT-4o Mini</option>
+
+                            <option>Claude</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="settings-group">
+
+                        <label>Response Temperature</label>
+
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value="0.7"
+                        >
+
+                    </div>
+
+                    <div class="settings-group toggle-group">
+
+                        <div>
+
+                            <h3>Streaming Responses</h3>
+
+                            <p>
+                                Show AI responses word-by-word
+                            </p>
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                id="streaming-toggle"
+                                checked
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="settings-card">
+
+                    <h2>Appearance</h2>
+
+                    <div class="settings-group toggle-group">
+
+                        <div>
+
+                            <h3>Dark Mode</h3>
+
+                            <p>
+                                Use dark dashboard appearance
+                            </p>
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                id="dark-mode-toggle"
+                                checked
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
+
+                    <div class="settings-group toggle-group">
+
+                        <div>
+
+                            <h3>Animations</h3>
+
+                            <p>
+                                Enable dashboard transitions
+                            </p>
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                id="animations-toggle"
+                                checked
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="settings-card danger-card">
+
+                    <h2>Danger Zone</h2>
+
+                    <div class="danger-box">
+
+                        <div>
+
+                            <h3>Clear Conversations</h3>
+
+                            <p>
+                                Delete all saved AI conversations permanently
+                            </p>
+
+                        </div>
+
+                        <form action="/clear-conversations" method="POST">
+
+                            <button
+                                type="submit"
+                                class="danger-btn"
+                            >
+                                Delete Chats
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    <div class="danger-box">
+
+                        <div>
+
+                            <h3>Logout Account</h3>
+
+                            <p>
+                                Sign out from your account
+                            </p>
+
+                        </div>
+
+                        <a href="/logout" class="logout-danger-btn">
+                            Logout
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const toggleBtn = document.getElementById("theme-toggle");
+
+if(localStorage.getItem("theme") === "dark"){
+
+    document.body.classList.add("dark-mode");
+
+}
+
+</script>
+
+<script>
+
+const animationToggle =
+document.getElementById("animations-toggle");
+
+animationToggle.addEventListener("change", () => {
+
+    if(animationToggle.checked){
+
+        document.body.classList.remove(
+            "animations-disabled"
+        );
+
+    } else {
+
+        document.body.classList.add(
+            "animations-disabled"
+        );
+
+    }
+
+});
+
+</script>
+
+<script>
+
+const darkModeToggle =
+document.getElementById("dark-mode-toggle");
+
+if(localStorage.getItem("theme") === "light"){
+
+    document.body.classList.remove("dark-mode");
+
+    darkModeToggle.checked = false;
+
+}
+
+darkModeToggle.addEventListener("change", () => {
+
+    if(darkModeToggle.checked){
+
+        document.body.classList.add("dark-mode");
+
+        localStorage.setItem(
+            "theme",
+            "dark"
+        );
+
+    } else {
+
+        document.body.classList.remove(
+            "dark-mode"
+        );
+
+        localStorage.setItem(
+            "theme",
+            "light"
+        );
+
+    }
+
+});
+
+</script>
+
+</body>
+
+</html>

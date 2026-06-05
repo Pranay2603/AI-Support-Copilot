@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Analytics</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+
+        <h2>AI Copilot</h2>
+
+        <a href="/new-chat" class="sidebar-link new-chat-btn">
+            + New Chat
+        </a>
+
+        <a href="/dashboard" class="sidebar-link">
+            Dashboard
+        </a>
+
+        <a href="/chat" class="sidebar-link">
+            AI Chat
+        </a>
+
+        <a href="/analytics" class="sidebar-link active-page">
+            Analytics
+        </a>
+
+        <a href="/settings" class="sidebar-link">
+            Settings
+        </a>
+
+    </div>
+
+    <div class="main">
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>Analytics</h1>
+
+                <p class="subtitle">
+                    Monitor AI activity, PDF usage, and platform insights
+                </p>
+
+                <div class="live-status">
+                    <span class="dot"></span>
+                    AI System Active
+                </div>
+
+            </div>
+
+            <div class="user-area">
+
+                <div class="user-badge">
+                    {{ user }}
+                </div>
+
+                <a href="/logout" class="logout-btn">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="analytics-page">
+
+            <div class="analytics-container">
+
+                <div class="analytics-grid">
+
+                    <div class="analytics-card">
+
+                        <h3>Most Queried Topic</h3>
+
+                        <p class="analytics-value">
+                            No data yet
+                        </p>
+
+                    </div>
+
+                    <div class="analytics-card">
+
+                        <h3>Most Used PDF</h3>
+
+                        <p class="analytics-value">
+                            No PDF uploaded yet
+                        </p>
+
+                    </div>
+
+                    <div class="analytics-card">
+
+                        <h3>Total Indexed PDFs</h3>
+
+                        <p class="analytics-value">
+                            0
+                        </p>
+
+                    </div>
+
+                    <div class="analytics-card">
+
+                        <h3>Vector Chunks</h3>
+
+                        <p class="analytics-value">
+                            0
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="chart-card">
+
+                    <h2>AI Query Activity</h2>
+
+                    <canvas id="activityChart"></canvas>
+
+                </div>
+
+                <div class="analytics-bottom">
+
+                    <div class="activity-feed">
+
+                        <h2>Recent Activity</h2>
+
+                        <div class="activity-item">
+                            No activity yet
+                        </div>
+
+                        <div class="activity-item">
+                            Upload a PDF to get started
+                        </div>
+
+                        <div class="activity-item">
+                            Create your first conversation
+                        </div>
+
+                        <div class="activity-item">
+                            Ask your first AI question
+                        </div>
+
+                    </div>
+
+                    <div class="pdf-insights">
+
+                        <h2>PDF Insights</h2>
+
+                        <div class="insight-item">
+                            No PDF uploaded yet
+                        </div>
+
+                        <div class="insight-item">
+                            PDF insights will appear here
+                        </div>
+
+                        <div class="insight-item">
+                            Active PDFs: 0
+                        </div>
+
+                        <div class="insight-item">
+                            Embedding Model: MiniLM-L6-v2
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ctx = document.getElementById('activityChart');
+
+new Chart(ctx, {
+
+    type: 'line',
+
+    data: {
+
+        labels: [
+            'Mon',
+            'Tue',
+            'Wed',
+            'Thu',
+            'Fri',
+            'Sat',
+            'Sun'
+        ],
+
+        datasets: [{
+
+            label: 'Queries',
+
+            data: [12, 19, 7, 15, 22, 10, 18],
+
+            borderColor: '#3b82f6',
+
+            backgroundColor: 'rgba(59,130,246,0.15)',
+
+            tension: 0.4,
+
+            fill: true
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+                    color: 'white'
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                ticks: {
+                    color: 'white'
+                },
+
+                grid: {
+                    color: 'rgba(255,255,255,0.05)'
+                }
+
+            },
+
+            y: {
+
+                ticks: {
+                    color: 'white'
+                },
+
+                grid: {
+                    color: 'rgba(255,255,255,0.05)'
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+<script>
+
+if(localStorage.getItem("theme") === "dark"){
+
+    document.body.classList.add("dark-mode");
+
+}
+
+</script>
+
+</body>
+
+</html>

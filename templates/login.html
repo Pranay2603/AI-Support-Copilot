@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="auth-page">
+
+    <div class="left">
+
+        <h1>AI Support Copilot</h1>
+
+        <p>
+            Automate customer support using AI-powered conversations,
+            smart responses, and modern SaaS workflows.
+        </p>
+
+    </div>
+
+    <div class="right">
+
+        <div class="card">
+
+            <h2>Login</h2>
+
+            <p>Welcome back</p>
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="post" action="/login">
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    required
+                >
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                >
+
+                <button type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <div class="link">
+                Don't have an account?
+                <a href="/signup">Sign up</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+
+        <h2>AI Copilot</h2>
+
+        <a href="/new-chat" class="sidebar-link new-chat-btn">
+            + New Chat
+        </a>
+
+        <a href="/dashboard" class="sidebar-link">
+            Dashboard
+        </a>
+
+        <a href="/chat" class="sidebar-link active-page">
+            AI Chat
+        </a>
+
+        <a href="/analytics" class="sidebar-link">
+            Analytics
+        </a>
+
+        <a href="/settings" class="sidebar-link">
+            Settings
+        </a>
+
+        <h3 class="recent-heading">Recents</h3>
+
+        <div class="conversation-list">
+
+            {% for convo in conversations %}
+
+            <div class="conversation-item">
+
+                <a
+                    href="/conversation/{{ convo[0] }}"
+                    class="sidebar-link {% if convo[0] == active_conversation %}active-chat{% endif %}"
+                >
+                    {{ convo[1][:30] if convo[1] else "New Chat" }}
+                </a>
+
+                <a
+                    href="/delete-conversation/{{ convo[0] }}"
+                    class="delete-btn delete-conversation-link"
+                >
+                    🗑
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <div class="main">
+
+        <div class="topbar">
+
+            <div>
+                <h1>AI Support Assistant</h1>
+
+                <p class="subtitle">
+                    Ask questions and manage conversations
+                </p>
+            </div>
+
+            <button id="theme-toggle" class="theme-btn">
+                🌙
+            </button>
+
+            <div class="user-area">
+
+                <div class="user-badge">
+                    {{ user }}
+                </div>
+
+                <a href="/logout" class="logout-btn">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="chat-box">
+
+            <h2>AI Support Assistant</h2>
+
+            <form
+                method="post"
+                action="/ask"
+                enctype="multipart/form-data"
+                class="chat-form"
+                id="chat-form"
+            >
+
+                <div class="file-upload-wrapper">
+
+                    <label for="file-upload" class="custom-file-upload">
+                        📄 Upload PDF
+                    </label>
+
+                    <span id="file-name">
+                        No file selected
+                    </span>
+
+                    <input
+                        id="file-upload"
+                        type="file"
+                        name="file"
+                        accept=".pdf"
+                    >
+
+                </div>
+
+                <input
+                    type="text"
+                    name="query"
+                    placeholder="Ask something..."
+                    autocomplete="off"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    id="send-btn"
+                >
+                    Send
+                </button>
+
+            </form>
+
+            <div class="chat-history">
+                {{ messages_html | safe }}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+window.onload = function () {
+
+    const chatHistory = document.querySelector(".chat-history");
+
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+};
+
+</script>
+
+<script>
+
+const form = document.getElementById("chat-form");
+
+const button = document.getElementById("send-btn");
+
+const chatHistory = document.querySelector(".chat-history");
+
+form.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const input = form.querySelector("input[name='query']");
+    const fileInput = document.querySelector("input[name='file']");
+
+    const query = input.value;
+
+    button.disabled = true;
+    button.innerText = "Thinking...";
+
+    const formData = new FormData();
+
+    formData.append("query", query);
+
+    if(fileInput.files.length > 0){
+        formData.append("file", fileInput.files[0]);
+    }
+
+    const response = await fetch("/ask", {
+
+        method:"POST",
+        body:formData
+
+    });
+
+    const data = await response.text();
+
+    const userMessage = `
+        <div class="message user-message">
+            <div class="message-header">
+                <div class="avatar user-avatar">U</div>
+                <b>You</b>
+            </div>
+            ${query}
+        </div>
+    `;
+
+    chatHistory.innerHTML += userMessage;
+
+    const aiDiv = document.createElement("div");
+
+    aiDiv.className = "message ai-message";
+
+    aiDiv.innerHTML = `
+        <div class="message-header">
+            <div class="avatar ai-avatar">AI</div>
+            <b>Assistant</b>
+        </div>
+        <div class="streaming-text"></div>
+    `;
+
+    aiDiv.querySelector(".streaming-text").innerHTML =
+        marked.parse(data);
+
+    chatHistory.appendChild(aiDiv);
+
+    input.value = "";
+    fileInput.value = "";
+
+    button.disabled = false;
+    button.innerText = "Send";
+
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+});
+
+</script>
+
+<script>
+
+const toggleBtn = document.getElementById("theme-toggle");
+
+if(localStorage.getItem("theme") === "dark"){
+
+    document.body.classList.add("dark-mode");
+
+    toggleBtn.innerText = "☀️";
+}
+
+toggleBtn.addEventListener("click", () => {
+
+    document.body.classList.toggle("dark-mode");
+
+    if(document.body.classList.contains("dark-mode")){
+
+        localStorage.setItem("theme", "dark");
+
+        toggleBtn.innerText = "☀️";
+
+    } else {
+
+        localStorage.setItem("theme", "light");
+
+        toggleBtn.innerText = "🌙";
+    }
+
+});
+
+</script>
+
+<script>
+
+const fileInput = document.getElementById("file-upload");
+
+const fileName = document.getElementById("file-name");
+
+fileInput.addEventListener("change", function(){
+
+    if(fileInput.files.length > 0){
+
+        fileName.innerText = fileInput.files[0].name;
+
+    } else {
+
+        fileName.innerText = "No file selected";
+
+    }
+
+});
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<div id="deleteModal" class="delete-modal">
+
+    <div class="delete-modal-content">
+
+        <h3>Delete chat?</h3>
+
+        <p>
+            This conversation will be permanently deleted.
+        </p>
+
+        <div class="delete-modal-actions">
+
+            <button id="cancelDelete">
+                Cancel
+            </button>
+
+            <a
+                id="confirmDelete"
+                href="#"
+                class="confirm-delete-btn"
+            >
+                Delete
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const deleteModal =
+    document.getElementById("deleteModal");
+
+const confirmDelete =
+    document.getElementById("confirmDelete");
+
+const cancelDelete =
+    document.getElementById("cancelDelete");
+
+document
+    .querySelectorAll(".delete-conversation-link")
+    .forEach(link => {
+
+        link.addEventListener("click", function(e){
+
+            e.preventDefault();
+
+            confirmDelete.href = this.href;
+
+            deleteModal.style.display = "flex";
+
+        });
+
+    });
+
+cancelDelete.addEventListener("click", function(){
+
+    deleteModal.style.display = "none";
+
+});
+
+window.addEventListener("click", function(e){
+
+    if(e.target === deleteModal){
+
+        deleteModal.style.display = "none";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
