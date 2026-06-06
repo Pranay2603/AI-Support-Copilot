@@ -1,12 +1,12 @@
-from groq import Groq
-from dotenv import load_dotenv
 import os
 import markdown
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
+from groq import Groq
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -14,9 +14,10 @@ client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
+embedding_model = FastEmbedEmbeddings(
+    model_name="BAAI/bge-small-en-v1.5"
 )
+
 
 def create_vector_store(pdf_path, user):
 
@@ -46,9 +47,8 @@ def create_vector_store(pdf_path, user):
         exist_ok=True
     )
 
-    vector_store.save_local(
-        faiss_path
-    )
+    vector_store.save_local(faiss_path)
+
 
 def ask_pdf(query, user):
 
@@ -102,14 +102,12 @@ def ask_pdf(query, user):
         """
 
         completion = client.chat.completions.create(
-
             messages=[
                 {
                     "role": "user",
                     "content": prompt
                 }
             ],
-
             model="llama-3.3-70b-versatile",
             temperature=0.3
         )
@@ -154,9 +152,8 @@ def ask_pdf(query, user):
         Please try again in a few moments.
         """
 
-def search_pdf(query):
 
-    print("SEARCHING PDF...")
+def search_pdf(query):
 
     if not os.path.exists("faiss_index"):
         return ""
@@ -171,8 +168,6 @@ def search_pdf(query):
         query,
         k=3
     )
-
-    print(docs)
 
     context = ""
 
